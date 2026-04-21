@@ -1,0 +1,8 @@
+{
+  "name": "GasTracker",
+  "description": "Busca gasolineras, compara precios de carburantes en tiempo real y obtén predicciones de precios para los próximos días.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
