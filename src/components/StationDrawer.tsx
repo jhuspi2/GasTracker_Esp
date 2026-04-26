@@ -333,12 +333,7 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
             )}
           </div>
 
-          <div className="mb-6 bg-zinc-100 dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 h-24 rounded-xl flex items-center justify-center overflow-hidden">
-            <div className="text-center">
-              <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest leading-none mb-1">Publicidad / Ads Space</p>
-              <p className="text-[9px] text-zinc-400">Espacio reservado para anunciantes</p>
-            </div>
-          </div>
+          {/* Ad slot — insert <ins class="adsbygoogle"> here once AdSense is approved */}
 
           <div className="mb-6">
             <h3 className="text-[11px] font-bold text-[#1e293b] dark:text-white uppercase tracking-wider mb-3">Precios de hoy</h3>
