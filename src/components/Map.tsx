@@ -161,9 +161,12 @@ export const GasMap: React.FC<MapProps> = ({
               <div class="absolute inset-0 bg-green-500 rounded-none blur-md opacity-40 animate-pulse scale-125"></div>
             ` : ''}
             <div class="relative flex flex-col items-center">
-              <div class="text-white px-2 py-1 shadow-2xl flex items-center justify-center relative z-10 border border-white/20" style="background-color: ${markerColor}">
-                <span class="text-[10px] font-mono font-black tracking-tight">${price.toFixed(3)}</span>
-                <span class="text-[7px] font-bold ml-0.5 opacity-60">€</span>
+              <div class="text-white px-2 py-1 shadow-2xl flex flex-col items-center justify-center relative z-10 border border-white/20" style="background-color: ${markerColor}">
+                <span class="text-[6px] font-bold uppercase tracking-wide opacity-75 leading-tight">${station.brand.slice(0, 10)}</span>
+                <div class="flex items-center">
+                  <span class="text-[10px] font-mono font-black tracking-tight">${price.toFixed(3)}</span>
+                  <span class="text-[7px] font-bold ml-0.5 opacity-60">€</span>
+                </div>
               </div>
               <!-- Industrial stem -->
               <div class="w-[2px] h-3 -mt-[1px]" style="background-color: ${markerColor}"></div>
