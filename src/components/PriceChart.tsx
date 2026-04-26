@@ -22,9 +22,10 @@ interface PriceChartProps {
   history: PriceHistory[];
   predictions: PricePrediction[];
   fuelType: FuelType;
+  tickEvery?: number;
 }
 
-export const PriceChart: React.FC<PriceChartProps> = ({ history, predictions, fuelType }) => {
+export const PriceChart: React.FC<PriceChartProps> = ({ history, predictions, fuelType, tickEvery }) => {
   const fuelInfo = FUEL_TYPES.find(f => f.id === fuelType);
   const chartColor = fuelInfo ? fuelInfo.color : '#3b82f6';
 
@@ -41,6 +42,10 @@ export const PriceChart: React.FC<PriceChartProps> = ({ history, predictions, fu
       type: 'prediction' 
     }))
   ];
+
+  // Adaptive tick interval: show ~5-6 labels regardless of range
+  const totalPoints = data.length;
+  const resolvedTickEvery = tickEvery ?? Math.max(1, Math.round(totalPoints / 5));
 
   // Find min/max for better Y axis scaling
   const prices = data.map(d => d.price);
@@ -74,8 +79,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({ history, predictions, fu
             dataKey="date" 
             tick={(props) => {
               const { x, y, payload, index } = props;
-              // Only show every 5th label for X axis to avoid clutter
-              if (index % 5 !== 0) return <g />;
+              if (index % resolvedTickEvery !== 0) return <g />;
               return (
                 <text x={x} y={y + 10} fontSize={8} fill="#71717a" textAnchor="middle">
                   {format(parseISO(payload.value), 'd/MM')}

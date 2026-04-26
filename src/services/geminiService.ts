@@ -225,7 +225,7 @@ interface Review {
 
 export function generateMockHistory(currentPrice: number): PriceHistory[] {
   const history: PriceHistory[] = [];
-  for (let i = 20; i >= 1; i--) {
+  for (let i = 30; i >= 1; i--) {
     const date = format(addDays(new Date(), -i), 'yyyy-MM-dd');
     // Random walk with trend
     const noise = (Math.random() - 0.5) * 0.05;

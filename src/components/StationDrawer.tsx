@@ -32,6 +32,14 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
   const [showPredictions, setShowPredictions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showClosedAlert, setShowClosedAlert] = useState(false);
+  const [timeRange, setTimeRange] = useState<'3d' | '1w' | '2w' | '1m'>('1m');
+
+  const TIME_RANGES: { id: '3d' | '1w' | '2w' | '1m'; label: string; days: number }[] = [
+    { id: '3d',  label: '3 días',   days: 3  },
+    { id: '1w',  label: '1 sem',    days: 7  },
+    { id: '2w',  label: '2 sem',    days: 14 },
+    { id: '1m',  label: '1 mes',    days: 30 },
+  ];
 
   const is24h = station?.schedule?.toLowerCase().includes('24h') || station?.schedule?.toLowerCase().includes('24 h') || station?.schedule?.toLowerCase().includes('l-d 24h');
 
@@ -258,11 +266,11 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[12px] font-bold text-[#1e293b] dark:text-white uppercase tracking-wider flex items-center">
                 <TrendingUp className="w-4 h-4 mr-2 text-[#64748b]" />
-                Historial (7 Días)
+                Historial
               </h3>
-              
+
               {!loading && (
-                <button 
+                <button
                   onClick={handleTogglePrediction}
                   className="flex items-center text-[10px] text-[#2563eb] font-black uppercase tracking-widest hover:underline group"
                 >
@@ -278,11 +286,28 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
                 </div>
               )}
             </div>
-            
-            <PriceChart 
-              history={history} 
-              predictions={showPredictions ? predictions : []} 
-              fuelType={selectedFuel} 
+
+            {/* Time range pills */}
+            <div className="flex gap-1.5 mb-3">
+              {TIME_RANGES.map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setTimeRange(r.id)}
+                  className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-wider transition-all border ${
+                    timeRange === r.id
+                      ? 'bg-[#2563eb] text-white border-[#2563eb]'
+                      : 'bg-transparent text-[#64748b] dark:text-zinc-400 border-[#e2e8f0] dark:border-zinc-700 hover:border-[#2563eb] hover:text-[#2563eb]'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            <PriceChart
+              history={history.slice(-(TIME_RANGES.find(r => r.id === timeRange)?.days ?? 30))}
+              predictions={showPredictions ? predictions : []}
+              fuelType={selectedFuel}
             />
             
             {showPredictions && predictions.length > 0 && (
