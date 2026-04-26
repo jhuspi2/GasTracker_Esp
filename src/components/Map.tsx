@@ -75,6 +75,17 @@ function MapUpdater({ center, zoom, lastCenterRequest }: { center: [number, numb
   return null;
 }
 
+function ZoomTracker({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    onZoomChange(map.getZoom());
+  }, []);
+  useMapEvents({
+    zoomend: () => onZoomChange(map.getZoom()),
+  });
+  return null;
+}
+
 function BoundsTracker({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds) => void }) {
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const map = useMap();
@@ -111,6 +122,8 @@ export const GasMap: React.FC<MapProps> = ({
   onBoundsChange,
   lastCenterRequest
 }) => {
+  const [currentZoom, setCurrentZoom] = React.useState(zoom);
+
   const cheapestId = React.useMemo(() => {
     if (stations.length === 0) return null;
     const available = stations.filter(s => s.prices[selectedFuel] !== undefined);
@@ -125,7 +138,7 @@ export const GasMap: React.FC<MapProps> = ({
     // Price only matters when we are close enough to see individual tags.
     // We synchronize this with the clustering threshold (Zoom 10 ~= 40km radius).
     // Achievement unlocked: Zoom 8 is enough to see labels without too much clutter
-    const isDetailedView = zoom >= 8;
+    const isDetailedView = currentZoom >= 8;
 
     return stations.map((station) => {
       const price = station.prices[selectedFuel];
@@ -182,7 +195,7 @@ export const GasMap: React.FC<MapProps> = ({
         />
       );
     });
-  }, [stations, selectedFuel, onStationSelect, zoom, cheapestId]);
+  }, [stations, selectedFuel, onStationSelect, currentZoom, cheapestId]);
 
   return (
     <div className="w-full h-full relative z-0">
@@ -203,6 +216,7 @@ export const GasMap: React.FC<MapProps> = ({
         />
         <MapUpdater center={center} zoom={zoom} lastCenterRequest={lastCenterRequest} />
         <BoundsTracker onBoundsChange={onBoundsChange} />
+        <ZoomTracker onZoomChange={setCurrentZoom} />
 
         {routePath && routePath.length > 0 && (
           <>
