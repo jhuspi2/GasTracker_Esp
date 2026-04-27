@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, MapPin, Clock, Navigation, TrendingUp, Sparkles, AlertCircle, Heart, Share2, Info, Star, ChevronRight, ShoppingBag, Droplets, Wind, Coffee } from 'lucide-react';
 import { GasStation, FuelType, PriceHistory, PricePrediction, FUEL_TYPES } from '../types';
 import { PriceChart } from './PriceChart';
+import { AdBanner } from './AdBanner';
 import { generateMockHistory, predictPrices } from '../services/geminiService';
 
 interface StationDrawerProps {
@@ -333,7 +334,10 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
             )}
           </div>
 
-          {/* Ad slot — insert <ins class="adsbygoogle"> here once AdSense is approved */}
+          {/* Ad banner */}
+          <div className="mb-6">
+            <AdBanner />
+          </div>
 
           <div className="mb-6">
             <h3 className="text-[11px] font-bold text-[#1e293b] dark:text-white uppercase tracking-wider mb-3">Precios de hoy</h3>
