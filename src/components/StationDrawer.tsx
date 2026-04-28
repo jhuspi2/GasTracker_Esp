@@ -9,7 +9,8 @@ import { X, MapPin, Clock, Navigation, TrendingUp, Sparkles, AlertCircle, Heart,
 import { GasStation, FuelType, PriceHistory, PricePrediction, FUEL_TYPES } from '../types';
 import { PriceChart } from './PriceChart';
 import { AdBanner } from './AdBanner';
-import { generateMockHistory, predictPrices } from '../services/geminiService';
+import { predictPrices } from '../services/geminiService';
+import { getStationHistory } from '../services/historyService';
 
 interface StationDrawerProps {
   station: GasStation | null;
@@ -48,16 +49,18 @@ export const StationDrawer: React.FC<StationDrawerProps> = ({
     if (station) {
       const currentPrice = station.prices[selectedFuel];
       if (currentPrice) {
-        const mockHistory = generateMockHistory(currentPrice);
-        setHistory(mockHistory);
-        setPredictions([]); // Reset predictions
-        setShowPredictions(false); // Reset visibility
-
-        // Perform prediction in background
+        setPredictions([]);
+        setShowPredictions(false);
         setLoading(true);
-        predictPrices(currentPrice, selectedFuel, mockHistory).then(preds => {
-          setPredictions(preds);
-          setLoading(false);
+
+        // Load real history from Supabase (falls back to mock if not enough data)
+        getStationHistory(station.id, selectedFuel, currentPrice).then(hist => {
+          setHistory(hist);
+          // Prediction runs after history is ready
+          predictPrices(currentPrice, selectedFuel, hist).then(preds => {
+            setPredictions(preds);
+            setLoading(false);
+          });
         });
       }
     }
