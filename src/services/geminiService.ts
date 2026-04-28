@@ -52,18 +52,45 @@ async function getMarketTrendIndex(): Promise<Record<string, number[]>> {
   }
 
   const prompt = `
-    Como analista experto en hidrocarburos en España, realiza un análisis de mercado.
-    CONSIDERA: Precio barril Brent, noticias de energía hoy en España, y estructura de impuestos (IEH fijo + IVA 21%).
-    
-    TAREA: Predice la variación porcentual esperada del PRECIO FINAL AL CONSUMIDOR para los próximos 3 días.
-    Combustibles: G95E5, G98E5, GOA, GPR.
-    
-    RESPUESTA: JSON con multiplicadores (ej: 1.002 = +0.2%).
+    Eres un analista cuantitativo experto en mercados de energía y precios de combustible en España.
+
+    PASO 1 — BÚSQUEDA DE DATOS (usa Google Search):
+    Busca y extrae los siguientes valores actuales:
+    - Precio spot Brent crude oil hoy (USD/barril) — fuente: ICE, Investing.com o Reuters
+    - Precio futuro ICE Brent front month (contrato más próximo, USD/barril)
+    - Precio futuro ICE Brent second month (siguiente contrato, USD/barril)
+    - Tipo de cambio EUR/USD actual
+    - Días hasta vencimiento del contrato front month
+
+    PASO 2 — CÁLCULO MATEMÁTICO:
+    Usa esta fórmula para calcular la variación diaria esperada en el precio al consumidor:
+
+    sensibilidad_G95   = (1/159) × (1/EURUSD) × 1.18 × 1.21   [€/L por cada $1/barril]
+    sensibilidad_G98   = (1/159) × (1/EURUSD) × 1.22 × 1.21
+    sensibilidad_GOA   = (1/159) × (1/EURUSD) × 1.10 × 1.21
+    sensibilidad_GPR   = (1/159) × (1/EURUSD) × 1.14 × 1.21
+
+    variacion_diaria_brent = (precio_futuro_front - precio_spot) / dias_vencimiento
+
+    Para cada día d (1, 2, 3):
+      delta_precio_d = variacion_diaria_brent × d × sensibilidad
+      multiplicador_d = 1 + (delta_precio_d / precio_actual_consumidor)
+
+    Precio actual de referencia al consumidor: G95≈1.45€/L, G98≈1.58€/L, GOA≈1.35€/L, GPR≈1.48€/L
+
+    Ajusta también según:
+    - La pendiente de la curva de futuros (contango vs backwardation)
+    - Si front month < second month (contango): presión alcista
+    - Si front month > second month (backwardation): presión bajista
+
+    PASO 3 — RESPUESTA:
+    Devuelve SOLO el JSON con los multiplicadores calculados para los 3 días.
+    Los multiplicadores deben estar entre 0.985 y 1.015 (variaciones realistas diarias).
     {
-      "G95E5": [1.002, 1.005, 1.008],
-      "G98E5": [1.002, 1.004, 1.007],
-      "GOA": [0.998, 0.995, 0.992],
-      "GPR": [0.998, 0.996, 0.993]
+      "G95E5": [día1, día2, día3],
+      "G98E5": [día1, día2, día3],
+      "GOA":   [día1, día2, día3],
+      "GPR":   [día1, día2, día3]
     }
   `;
 
